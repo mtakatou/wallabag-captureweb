@@ -1,0 +1,23 @@
+version: "2.2"
+    
+services:
+
+  wallabag-captureweb:
+    build: wallabag-captureweb
+    container_name: wallabag-captureweb
+    image: wallabag-captureweb
+    hostname: wallabag-captureweb
+    cpus: 1
+    mem_limit: 1gb
+    memswap_limit: 2gb
+    environment:
+      WALLABAG_URL: https://...
+      
+      WALLABAG_CLIENT_ID: ...
+      WALLABAG_CLIENT_SECRET: ...
+
+      WALLABAG_USERNAME: ...
+      WALLABAG_PASSWORD: ...
+
+      DAV_URL: http://...
+      

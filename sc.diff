@@ -1,0 +1,48 @@
+diff --git a/screenshot.py b/screenshot.py
+index f26d12e..3ec4c01 100644
+--- a/screenshot.py
++++ b/screenshot.py
+@@ -19,8 +19,8 @@ logger = getLogger(__name__)
+ 
+ def args_parser():
+     parser = ArgumentParser()
+-    parser.add_argument('url', help='specify URL')
+-    parser.add_argument('filename', help='specify capture image filename')
++    parser.add_argument('--url', help='specify URL')
++    parser.add_argument('--filename', help='specify capture image filename')
+     parser.add_argument('-w', help="specify window size like 1200x800", dest="window_size", type=str)
+     parser.add_argument('--ua', help="specify user-agent", dest="user_agent", type=str)
+     parser.add_argument('--wait', help="specify wait seconds after scroll", dest="wait", type=float, default=0.2)
+@@ -62,9 +62,10 @@ def capture_full_screenshot(url, filename, window_size=None, user_agent=None, wa
+     options = webdriver.ChromeOptions()
+     options.set_headless()
+     options.add_argument('--no-sandbox')
++    options.add_argument("--disable-dev-shm-usage")    
+     desired_capabilities = dict(acceptInsecureCerts=True)
+     if user_agent:
+-        options.add_argument(f"user-agent={user_agent}")
++        options.add_argument("user-agent=%s" % user_agent)
+     driver = webdriver.Chrome(options=options, desired_capabilities=desired_capabilities)
+ 
+     if window_size:
+@@ -98,7 +99,7 @@ def capture_screen_area(driver: webdriver.Chrome, filename, client_info: ClientI
+             scroll_to(driver, x_pos, y_pos)
+             sleep(wait or 0.2)
+             cur_x, cur_y = get_current_pos(driver)
+-            logger.info(f"scrolling to {(x_pos, y_pos)}, current pos is {(cur_x, cur_y)}")
++            logger.info("scrolling to {(%d, %d)}, current pos is {(%d, %d)}" % ( x_pos, y_pos, cur_x, cur_y))
+             img = Image.open(BytesIO(driver.get_screenshot_as_png()))  # type: Image.Image
+             resized_image = img.resize((client_info.window_width, client_info.window_height))
+             canvas.paste(resized_image, (cur_x, cur_y))
+@@ -117,7 +118,10 @@ def prepare_capture(driver):
+ 
+ 
+ def get_client_info(driver):
+-    return ClientInfo(*driver.execute_script(FULL_SIZE_JS))
++    ci=ClientInfo(*driver.execute_script(FULL_SIZE_JS))
++    if ci.full_height > 10000:
++        return ci._replace(full_height=10000)
++    return ci
+ 
+ 
+ FULL_SIZE_JS = '''

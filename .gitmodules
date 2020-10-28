@@ -1,0 +1,3 @@
+[submodule "docker_capture_web"]
+	path = docker_capture_web
+	url = https://github.com/mokemokechicken/docker_capture_web.git
